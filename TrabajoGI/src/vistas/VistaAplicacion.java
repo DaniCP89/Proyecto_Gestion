@@ -10,7 +10,9 @@ import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JTable;
-
+/*
+ * Programadores : Jairo y Daniel
+ */
 public class VistaAplicacion {
 
 	private JFrame frmLibros;
