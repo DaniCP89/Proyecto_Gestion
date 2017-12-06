@@ -11,6 +11,9 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JTable;
 
+/*
+ * GIT COMPLETO
+ */
 public class VistaAplicacion {
 
 	private JFrame frmLibros;
