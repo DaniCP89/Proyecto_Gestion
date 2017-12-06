@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JTable;
 /*
- * Programadores : Jairo y Daniel
+ * ProgramadoresNivelDios : Jairo y Daniel
  */
 public class VistaAplicacion {
 
