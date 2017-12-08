@@ -64,7 +64,7 @@ public class tMateria {
 		return Nombre;
 	}
 
-	public void setNombre(String nombre) throws SQLException {
+	public void setNombre(String nombre) throws Exception {
 		if (nombre != null) {
 			BD miBD = new BD(BD_NAME);
 			miBD.Update("UPDATE tMateria SET NOMBRE = '" + nombre + "' WHERE ID = '" + this.ID_Materia

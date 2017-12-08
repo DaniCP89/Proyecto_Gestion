@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class tLibro {
-	private long ID;
+	private Integer ID;
 	private String Titulo;
 	private String Autor;
 	private String ID_Materia;
 	private static String BD_NAME = "TrabajoGI1718";
 
-	public tLibro(long id, String t, String a, String iM) throws SQLException {
+	public tLibro(Integer id, String t, String a, String iM) throws SQLException {
 		this.ID = id;
 		this.Titulo = t;
 		this.Autor = a;
@@ -22,28 +22,37 @@ public class tLibro {
 				+ "', '" + this.Autor + "', '" + this.ID_Materia + "') ");
 	}
 	
-	public tLibro(long id) throws SQLException {
+	public tLibro(Integer id) throws SQLException {
 		//Dado el ID creamos el objeto
 		BD miBD = new BD(BD_NAME);
 		Object [] tupla = miBD.Select("SELECT * FROM tLibro WHERE ID = "+id+" ").get(0);
-		this.ID=id;
+		this.ID= id;
 		this.Titulo=(String) tupla[1];
 		this.Autor=(String) tupla[2];
 		this.ID_Materia=(String) tupla[3];
-	
+	}
+	/*
+	 * Daniel Cuevas: he necesitado este constructor para cuando obtenga el titulo de la tabla, rellenar el campo textField del autor y desplegar la lista de materias asociadas
+	 * Dado que en la tabla esta rellena con ID numerio y en la base de datos son letras.
+	 */
+	public tLibro(String titulo) throws Exception{
+		BD miBD = new BD(BD_NAME);
+		Object [] tupla = miBD.Select("SELECT * FROM tLibro WHERE TITULO = '"+titulo+"' ").get(0);
+		this.ID= (Integer) tupla[0];
+		this.Titulo=(String) tupla[1];
+		this.Autor=(String) tupla[2];
+		this.ID_Materia=(String) tupla[3];
 	}
 	
 	public static List<tLibro> ListaLibros() throws SQLException {
+		int ID;
 		ArrayList<tLibro> lista = new ArrayList<tLibro>();
 		// Retorna una lista con todos los objetos de la clase almacenados en la
 		// base de datos
 		BD miBD = new BD(BD_NAME);
 		for (Object[] tupla : miBD.Select("SELECT * FROM tLibro")) {
-			Long id = (Long)tupla[0];
-			String t = (String) tupla[1];
-			String a = (String) tupla[2];
-			String iM = (String) tupla[3];
-			lista.add(new tLibro(id));
+			ID = (int) (long)tupla[0];
+			lista.add(new tLibro(ID));
 		}
 
 		return lista;
