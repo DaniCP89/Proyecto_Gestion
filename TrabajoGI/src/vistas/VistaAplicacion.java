@@ -146,6 +146,7 @@ public class VistaAplicacion extends JPanel{
 	}
 	
 	/*
+	 * Apartado 3
 	 * Programador: Daniel Cuevas
 	 * Implementación : metodo donde vinculo el controlador de la lista
 	 */
@@ -166,6 +167,7 @@ public class VistaAplicacion extends JPanel{
 	 }
 	 
 	 /*
+	  * Apartado 3
 	  * Daniel Cuevas : En este metodo cargo la tabla con los libros de la base da datos
 	  * y cuando se pulsa en un determinado libro se carga la lista de materias, teniendo el focus en su materia relacionada
 	  */
@@ -195,23 +197,22 @@ public class VistaAplicacion extends JPanel{
 				}
 			});
 		}
-				
+	/*
+	 * Daniel: Método auxiliar que añade a la lista de materias las materias de la base de datos
+	 * Apartado 3
+	 */
 	 public void cargarListaMaterias(tMateria materia) throws Exception{
 			for(int i = 0; i< materia.ListaMaterias().size() ; i++ ){
 				modeloLista.addElement(materia.ListaMaterias().get(i).getNombre());
 			}
 	 }
+	 /*
+	  * Daniel: Método auxiliar donde introduzco los valores en los campos textField de Título y autor
+	  * Apartado 3
+	  */
 	 public void cargarTextField(tLibro libro) throws Exception{
 			textField.setText(libro.getTitulo());
 			textField_1.setText(libro.getAutor());
-	 }
-	 
-	 public void setTitulo(String titulo){
-		 textField.setText(titulo);
-	 }
-	 
-	 public void setAutor(String autor){
-		 textField.setText(autor);
 	 }
 	 
 	 public void mensaje(String mensaje){
