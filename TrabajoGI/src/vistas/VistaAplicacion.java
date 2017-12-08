@@ -147,7 +147,7 @@ public class VistaAplicacion extends JPanel{
 			Object[] rowData = new Object[2];
 			rowData[0]= listLibros.get(i).getID();
 			rowData[1]=	listLibros.get(i).getTitulo();	
-			modeloTabla.addRow(rowData);
+			modeloTabla.addRow(rowData); // Añado la fila al DafaultModel con el array que contiene ID y Titulo
 		}
 		
 		table.getColumnModel().getColumn(0).setMaxWidth(40);//Daniel: configuro tamaño maximo de la columna ID
