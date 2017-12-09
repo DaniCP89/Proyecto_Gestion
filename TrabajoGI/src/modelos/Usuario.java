@@ -10,7 +10,7 @@ public class Usuario
     private String password;
     private Rol rol;
 
-	public static List<Usuario> ListaUsuarios() throws SQLException
+	public static List<Usuario> ListaUsuarios() throws Exception
 	{
 		// Retorna una lista con todos los obejtos de la clase almacenados en la base de datos
 		BD miBD = new BD(BD_NAME);
@@ -26,23 +26,24 @@ public class Usuario
 		return lista;
 	}
 	
-    public Usuario(String n, String p) throws SQLException
+    public Usuario(String n, String p) throws SQLException,Exception
     {
 		// Crea el objeto cargando sus valores de la base de datos
     	BD miBD = new BD(BD_NAME);			
   
 		Object[] tupla = miBD.Select("SELECT * FROM tUsuario WHERE nombre='"+n+"'").get(0);
 		
-        nombre = (String)tupla[0];
-        password = (String)tupla[1];
-        
-        if (p.compareTo(password)!=0)
-        {
-        	nombre = password = null;
-        	rol = null;
-        	throw new Error("Usuario o Contraseña Incorrecta");
-        }
-        
+
+		nombre = (String)tupla[0];
+    	password = (String)tupla[1];
+    
+    	if (p.compareTo(password)!=0)
+    	{
+    		nombre = password = null;
+    		rol = null;
+    		throw new Error("Usuario o Contraseña Incorrecta");
+    	}
+
         rol = new Rol((String)tupla[2]);        
         
     }

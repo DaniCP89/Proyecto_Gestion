@@ -1,10 +1,9 @@
 package vistas;
-import java.awt.EventQueue;
+
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -15,11 +14,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-
-import controladores.Ctrl;
 import modelos.Usuario;
 import modelos.tLibro;
 import modelos.tMateria;
@@ -35,15 +31,18 @@ public class VistaAplicacion extends JPanel{
 	private boolean aux = true;
 	private JButton bLimpiar,bSalir, bBorrar; ;
 	private JTextField lTitulo, lAutor;
+	private Usuario usuario;
 	
-	
+	//---------------------------------------------------------------------------- INICIO EESTRUCTURA VISTA APLICACION ------------------------------------------------------------------------
 	public VistaAplicacion(Usuario user) throws Exception {
 		
+		usuario = user;
 		frmLibros = new JFrame();
 		frmLibros.setTitle("Libros");
 		frmLibros.setBounds(100, 100, 850, 680);
 		frmLibros.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmLibros.getContentPane().setLayout(null);
+		frmLibros.setVisible(true);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(282, 67, 363, 110);
@@ -131,12 +130,12 @@ public class VistaAplicacion extends JPanel{
 		frmLibros.getContentPane().add(bBorrar);
 		
 		generarContenidoTabla();
-		controlTabla();
-		
 	}
-	/*
-	 * Daniel :Controlador de los botones
-	 */
+	//--------------------------------------------------------------------------FIN ESTRUCTURA VISTA APLICACION ------------------------------------------------------------------------------
+	
+	
+	//--------------------------------------------------------------------LOS TRES CONTROLADORES BOTONES , TABLA y LISTA ---------------------------------------------------------------------
+	//Daniel :CONTROLADOR DE BOTONES
 	public void controladorVista(ActionListener ctrl){
 		bLimpiar.addActionListener(ctrl);
 		bLimpiar.setActionCommand("LIMPIAR");
@@ -146,19 +145,23 @@ public class VistaAplicacion extends JPanel{
 		
 		bSalir.addActionListener(ctrl);
 		bSalir.setActionCommand("SALIR");
-		
 	}
 	
-	/*
-	 * Apartado 3
-	 * Programador: Daniel Cuevas
-	 * Implementación : metodo donde vinculo el controlador de la lista
-	 */
+	//Apartado 3. Daniel Cuevas : CONTROLADOR TABLA.
+	public void controlTabla(ListSelectionListener ctr) {
+		table.getSelectionModel().addListSelectionListener(ctr);
+	}
+	
+	 //Apartado 3. Daniel: CONTROLADOR LISTA DE MATERIAS
 	public void controladorLista(ListSelectionListener ctrLista){
 		listMateria.addListSelectionListener(ctrLista);
 	}
+	//----------------------------------------------------------------------- FIN CONTROLADORES ------------------------------------------------------------------------------------------
 	
-	 public void generarContenidoTabla() throws Exception{
+	//---------------------------------------------------------------------- METODOS AUXILIARES -------------------------------------------------------------------------------------------
+	
+	//Daniel: METODO QUE GENERA EL CONTENIDO DE LA TABLA CUANDO SE INICIA LA VISTA
+	public void generarContenidoTabla() throws Exception{
 		List<tLibro> listLibros = new ArrayList<tLibro>();
 		listLibros = tLibro.ListaLibros();//Daniel: Almaceno una lista con todos los objetos de tLibro de la base da datos
 		
@@ -170,58 +173,22 @@ public class VistaAplicacion extends JPanel{
 		}
 	 }
 	 
-	 /*
-	  * Apartado 3
-	  * Daniel Cuevas : En este metodo cargo la tabla con los libros de la base da datos
-	  * y cuando se pulsa en un determinado libro se carga la lista de materias, teniendo el focus en su materia relacionada
-	  */
-		public void controlTabla() {
-			
-			select = table.getSelectionModel();
-			select.addListSelectionListener(new ListSelectionListener() {//Daniel:  obtengo el SelectionListener para controlar los cambios
-				public void valueChanged(ListSelectionEvent e) {// En cada cambio de seleción de la tabla:
-					tLibro libro;
-					if (!select.isSelectionEmpty()) {
-						if (!e.getValueIsAdjusting()){
-							try {
-								int id = (int) modeloTabla.getValueAt(table.getSelectedRow(), 0);// obtengo el valor id del libro seleccionado
-								libro = new tLibro(id);	//creo un objeto libro con el titulo obtenido anteriormente, el cual contendra todos los datos de la base da datos
-								tMateria materia = new tMateria(libro.getID_Materia());// Creo un objeto materia con el ID_Materia del objeto libro anterior
-								cargarTextField(libro);// Cargo valores en los TextField
-								if(aux){
-									cargarListaMaterias(materia); // Cargo la lista de materias solo una vez, sino cada vez que pulse un libro se vuelve a cargar
-									aux = false;
-								}
-								boolean scrollIntoView = true;
-								listMateria.setSelectedValue(materia.getNombre(), scrollIntoView);// Cambio el focus de la lista materias dependiendo del libro que seleccione
-							} catch (Exception e1) {
-							}
-						}
-					}
-				}
-			});
-		}
-	/*
-	 * Daniel: Método auxiliar que añade a la lista de materias las materias de la base de datos
-	 * Apartado 3
-	 */
+	 //Apartado 3. Daniel: Método auxiliar que añade a la lista de materias las materias de la base de datos
 	 public void cargarListaMaterias(tMateria materia) throws Exception{
 			for(int i = 0; i< materia.ListaMaterias().size() ; i++ ){
 				modeloLista.addElement(materia.ListaMaterias().get(i).getNombre());
 			}
 	 }
-	 /*
-	  * Daniel: Método auxiliar donde introduzco los valores en los campos textField de Título y autor
-	  * Apartado 3
-	  */
+	
+	 //Apartado 3.Daniel: Método auxiliar donde introduzco los valores en los campos textField de Título y autor
 	 public void cargarTextField(tLibro libro) throws Exception{
 		lTitulo.setText(libro.getTitulo());
 		lAutor.setText(libro.getAutor());
 	 }
 	 
 	 /*
-	  * Daniel: metodo auxiliar que es llamado por el controladorVista que elimina el contenido
-	  * de los dos textFields y quita la seleccion del Jtable.
+	  * Daniel: Apartado 4. Método auxiliar que es llamado por el controladorVista que elimina el contenido
+	  * de los dos textFields y quita la seleccion del Jtable. Tambien lo utilizo cuando borro una libro.
 	  */
 	 public void limpiar(){
 		 lTitulo.setText("");;
@@ -229,41 +196,35 @@ public class VistaAplicacion extends JPanel{
 		 table.clearSelection();
 	 }
 	 /*
-	  * Daniel : metodo que utiliza el controlador cuando se pulsa el boton BORRAR
+	  *  Daniel : Apartado 7. Método que utiliza el controlador cuando se pulsa el boton BORRAR
 	  *  Elimina el libro de la base de datos y elimina la fila donde se seleccionó el libro.
 	  *  Tambien limpio los campos textFiled del libro a borrar.
 	  */
 	 public void borrar() throws Exception{
-		 int id = (int) modeloTabla.getValueAt(table.getSelectedRow(), 0); // obtengo valor ID de la fila seleccionada 
+		 int id = (int) table.getModel().getValueAt(table.getSelectedRow(), 0); // obtengo valor ID de la fila seleccionada 
 		 tLibro libro = new tLibro(id);// Creo objeto libro con el id obtenido
 		 libro.BorrarLibro(); // metodo para borrar libro de la Base de datos
-		 modeloTabla.removeRow(table.getSelectedRow());
+		 modeloTabla.removeRow(table.getSelectedRow());// Elimina la fila que getSelectedRow() devuelve.
 		 limpiar();
+	 }
+	
+	 public JTable getTabla(){
+		 return table;
+	 }
+	 public JList<String> getLista(){
+		 return listMateria;
+	 }
+	 public Usuario getUsuario(){
+		 return usuario;
 	 }
 	 
 	 public void mensaje(String mensaje){
-		 //Jairo create un JLabel en la base de la vista para escribir mensajes ahi, aunque no se si hace falta todavia.
+		 //Jairo create un JLabel en la base de la vista para escribir mensajes ahi
+		 //Para poner por ejemplo : Libro borrado con exito, Libro insertado con exito, Libro modificado con exito...
 	 }
 	 
-	 /*
-	  * Daniel: Metodo auxiliar que utiliza el controlador dela vista para cerrar la ventana
-	  */
+	 //Daniel: Apartado 4. Método auxiliar que utiliza el controlador de la vista para cerrar la ventana
 	 public void salir(){
 		 frmLibros.dispose();
 	 }
-	 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VistaAplicacion window = new VistaAplicacion(null);
-					Ctrl control = new Ctrl(window);
-					window.controladorVista(control);
-					window.frmLibros.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 }

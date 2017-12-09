@@ -53,6 +53,7 @@ public class tLibro {
 	public int getID() {
 		return ID;
 	}
+	
 
 	public void setID(int id) throws SQLException {
 		if (id > 0) {
