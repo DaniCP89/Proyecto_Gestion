@@ -35,15 +35,7 @@ public class tLibro {
 	 * Daniel Cuevas: he necesitado este constructor para cuando obtenga el titulo de la tabla, rellenar el campo textField del autor y desplegar la lista de materias asociadas
 	 * Dado que en la tabla esta rellena con ID numerio y en la base de datos son letras.
 	 */
-	public tLibro(String titulo) throws Exception{
-		BD miBD = new BD(BD_NAME);
-		Object [] tupla = miBD.Select("SELECT * FROM tLibro WHERE TITULO = '"+titulo+"' ").get(0);
-		this.ID= (Integer) tupla[0];
-		this.Titulo=(String) tupla[1];
-		this.Autor=(String) tupla[2];
-		this.ID_Materia=(String) tupla[3];
-	}
-	
+
 	public static List<tLibro> ListaLibros() throws SQLException {
 		int ID;
 		ArrayList<tLibro> lista = new ArrayList<tLibro>();
@@ -58,7 +50,7 @@ public class tLibro {
 		return lista;
 	}
 
-	public long getID() {
+	public int getID() {
 		return ID;
 	}
 
@@ -114,8 +106,7 @@ public class tLibro {
 	public void BorrarLibro() throws SQLException {
 		// Actualiza el grupo que toca esta cancion dado su nombre
 		BD miBD = new BD(BD_NAME);
-		miBD.Delete("DELETE FROM tLibro WHERE ID ='" + this.ID + "'");
-
+		miBD.Delete("DELETE FROM tLibro WHERE ID =" + this.ID + ""); //Daniel: he tenido que quitar las '' de this.ID ya que es una variable tipo int
 		ID = -1;
 		Titulo = null;
 		Autor = null;

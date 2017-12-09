@@ -1,30 +1,25 @@
 package vistas;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JList;
-import javax.swing.JLabel;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JTextField;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableColumnModelListener;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import controladores.Ctrl;
 import modelos.Usuario;
 import modelos.tLibro;
 import modelos.tMateria;
@@ -32,14 +27,15 @@ import modelos.tMateria;
 public class VistaAplicacion extends JPanel{
 	
 	private JFrame frmLibros;
-	private JTextField textField;
-	private JTextField textField_1;
 	private JTable table;
 	private DefaultListModel<String> modeloLista;
 	private DefaultTableModel modeloTabla;
 	private JList<String> listMateria;
 	private ListSelectionModel select;
 	private boolean aux = true;
+	private JButton bLimpiar,bSalir, bBorrar; ;
+	private JTextField lTitulo, lAutor;
+	
 	
 	public VistaAplicacion(Usuario user) throws Exception {
 		
@@ -92,33 +88,33 @@ public class VistaAplicacion extends JPanel{
 		scrollPane_1.setViewportView(table);
 		frmLibros.getContentPane().add(scrollPane_1);
 		
-		textField = new JTextField();
-		textField.setBounds(151, 444, 642, 31);
-		textField.setHorizontalAlignment(JTextField.LEFT);// Daniel Cuevas: He tenido que alinear el text a la izquierda debido a que los titulos de los libros son grandes
+		lTitulo = new JTextField();
+		lTitulo.setBounds(151, 444, 642, 31);
+		lTitulo.setHorizontalAlignment(JTextField.LEFT);// Daniel Cuevas: He tenido que alinear el text a la izquierda debido a que los titulos de los libros son grandes
 		
-		frmLibros.getContentPane().add(textField);
-		textField.setColumns(10);
+		frmLibros.getContentPane().add(lTitulo);
+		lTitulo.setColumns(10);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(151, 495, 642, 31);
-		frmLibros.getContentPane().add(textField_1);
+		lAutor = new JTextField();
+		lAutor.setColumns(10);
+		lAutor.setBounds(151, 495, 642, 31);
+		frmLibros.getContentPane().add(lAutor);
 		
-		JButton btnNewButton = new JButton("Insertar");
+		JButton btnNewButton = new JButton("INSERTAR");
 		btnNewButton.setBounds(151, 567, 104, 23);
 		frmLibros.getContentPane().add(btnNewButton);
 		
-		JButton btnNewButton_1 = new JButton("Limpiar");
-		btnNewButton_1.setBounds(559, 567, 102, 23);
-		frmLibros.getContentPane().add(btnNewButton_1);
+		bLimpiar = new JButton("LIMPIAR");
+		bLimpiar.setBounds(559, 567, 102, 23);
+		frmLibros.getContentPane().add(bLimpiar);
 		
-		JButton btnNewButton_2 = new JButton("Actualizar");
-		btnNewButton_2.setBounds(427, 567, 102, 23);
+		JButton btnNewButton_2 = new JButton("ACTUALIZAR");
+		btnNewButton_2.setBounds(427, 567, 120, 23);// Daniel: (Posicion pixel Izquierda, posicion pixel Superior, anchura, altura)
 		frmLibros.getContentPane().add(btnNewButton_2);
 		
-		JButton btnNewButton_3 = new JButton("Salir");
-		btnNewButton_3.setBounds(689, 567, 104, 23);
-		frmLibros.getContentPane().add(btnNewButton_3);
+		bSalir = new JButton("SALIR");
+		bSalir.setBounds(689, 567, 104, 23);
+		frmLibros.getContentPane().add(bSalir);
 		
 		JLabel lblNewLabel = new JLabel("T\u00EDtulo");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
@@ -130,19 +126,27 @@ public class VistaAplicacion extends JPanel{
 		lblNewLabel_1.setBounds(46, 503, 89, 14);
 		frmLibros.getContentPane().add(lblNewLabel_1);
 		
-		JButton button = new JButton("Borrar");
-		button.setBounds(289, 567, 102, 23);
-		frmLibros.getContentPane().add(button);
+		bBorrar = new JButton("BORRAR");
+		bBorrar.setBounds(289, 567, 102, 23);
+		frmLibros.getContentPane().add(bBorrar);
 		
 		generarContenidoTabla();
 		controlTabla();
 		
 	}
-	
+	/*
+	 * Daniel :Controlador de los botones
+	 */
 	public void controladorVista(ActionListener ctrl){
-		/*
-		 * Para controlar los botones mayormente
-		 */
+		bLimpiar.addActionListener(ctrl);
+		bLimpiar.setActionCommand("LIMPIAR");
+		
+		bBorrar.addActionListener(ctrl);
+		bBorrar.setActionCommand("BORRAR");
+		
+		bSalir.addActionListener(ctrl);
+		bSalir.setActionCommand("SALIR");
+		
 	}
 	
 	/*
@@ -180,7 +184,8 @@ public class VistaAplicacion extends JPanel{
 					if (!select.isSelectionEmpty()) {
 						if (!e.getValueIsAdjusting()){
 							try {
-								libro = new tLibro(table.getSelectedRow()+1);	//Obtengo fila seleccionada y creo un objeto libro, el cual contendra todos los datos de la base da datos											
+								int id = (int) modeloTabla.getValueAt(table.getSelectedRow(), 0);// obtengo el valor id del libro seleccionado
+								libro = new tLibro(id);	//creo un objeto libro con el titulo obtenido anteriormente, el cual contendra todos los datos de la base da datos
 								tMateria materia = new tMateria(libro.getID_Materia());// Creo un objeto materia con el ID_Materia del objeto libro anterior
 								cargarTextField(libro);// Cargo valores en los TextField
 								if(aux){
@@ -190,7 +195,6 @@ public class VistaAplicacion extends JPanel{
 								boolean scrollIntoView = true;
 								listMateria.setSelectedValue(materia.getNombre(), scrollIntoView);// Cambio el focus de la lista materias dependiendo del libro que seleccione
 							} catch (Exception e1) {
-								
 							}
 						}
 					}
@@ -211,12 +215,41 @@ public class VistaAplicacion extends JPanel{
 	  * Apartado 3
 	  */
 	 public void cargarTextField(tLibro libro) throws Exception{
-			textField.setText(libro.getTitulo());
-			textField_1.setText(libro.getAutor());
+		lTitulo.setText(libro.getTitulo());
+		lAutor.setText(libro.getAutor());
+	 }
+	 
+	 /*
+	  * Daniel: metodo auxiliar que es llamado por el controladorVista que elimina el contenido
+	  * de los dos textFields y quita la seleccion del Jtable.
+	  */
+	 public void limpiar(){
+		 lTitulo.setText("");;
+		 lAutor.setText("");
+		 table.clearSelection();
+	 }
+	 /*
+	  * Daniel : metodo que utiliza el controlador cuando se pulsa el boton BORRAR
+	  *  Elimina el libro de la base de datos y elimina la fila donde se seleccionó el libro.
+	  *  Tambien limpio los campos textFiled del libro a borrar.
+	  */
+	 public void borrar() throws Exception{
+		 int id = (int) modeloTabla.getValueAt(table.getSelectedRow(), 0); // obtengo valor ID de la fila seleccionada 
+		 tLibro libro = new tLibro(id);// Creo objeto libro con el id obtenido
+		 libro.BorrarLibro(); // metodo para borrar libro de la Base de datos
+		 modeloTabla.removeRow(table.getSelectedRow());
+		 limpiar();
 	 }
 	 
 	 public void mensaje(String mensaje){
 		 //Jairo create un JLabel en la base de la vista para escribir mensajes ahi, aunque no se si hace falta todavia.
+	 }
+	 
+	 /*
+	  * Daniel: Metodo auxiliar que utiliza el controlador dela vista para cerrar la ventana
+	  */
+	 public void salir(){
+		 frmLibros.dispose();
 	 }
 	 
 	public static void main(String[] args) {
@@ -224,6 +257,8 @@ public class VistaAplicacion extends JPanel{
 			public void run() {
 				try {
 					VistaAplicacion window = new VistaAplicacion(null);
+					Ctrl control = new Ctrl(window);
+					window.controladorVista(control);
 					window.frmLibros.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
