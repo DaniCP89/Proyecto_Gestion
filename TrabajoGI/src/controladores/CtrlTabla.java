@@ -22,7 +22,6 @@ public class CtrlTabla implements ListSelectionListener {
 		this.vista = vista;
 	}
 	
-	
 	public void valueChanged(ListSelectionEvent e) {
 		tLibro libro;
 		usuario = vista.getUsuario();
@@ -49,7 +48,5 @@ public class CtrlTabla implements ListSelectionListener {
 				}
 			}
 		}
-
 	}
-
 }

@@ -60,6 +60,7 @@ public class BD
 			rset = stmt.executeQuery(sel);
 			ResultSetMetaData meta = rset.getMetaData();
 			int numCol = meta.getColumnCount();
+			
 			while (rset.next())
 			{
 				Object[] tupla = new Object[numCol];
@@ -76,7 +77,6 @@ public class BD
 		{
 			throw new Error("Error en el SELECT: " + sel+ ". " + ex.getMessage());
 		}		
-		
 		return lista;
 	}
 	

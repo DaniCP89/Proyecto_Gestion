@@ -27,6 +27,12 @@ public class tMateria {
 		this.Nombre = (String) tupla[1];
 
 	}
+	
+	public static String encontrarID (String name) throws SQLException {
+		BD miBD = new BD(BD_NAME);
+		String id = (String) miBD.SelectEscalar("SELECT ID_Materia FROM tMateria WHERE NOMBRE = '" + name + "' ");
+		return id;
+	}
 
 	@Override
 	public String toString() {

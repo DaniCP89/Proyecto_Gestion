@@ -1,9 +1,12 @@
 package vistas;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,8 +17,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+
+import modelos.BD;
 import modelos.Usuario;
 import modelos.tLibro;
 import modelos.tMateria;
@@ -29,9 +36,10 @@ public class VistaAplicacion extends JPanel{
 	private JList<String> listMateria;
 	private ListSelectionModel select;
 	private boolean aux = true;
-	private JButton bLimpiar,bSalir, bBorrar; ;
+	private JButton bLimpiar,bSalir, bBorrar, bInsertar, bActualizar;
 	private JTextField lTitulo, lAutor;
 	private Usuario usuario;
+	private JLabel mensaje;
 	
 	//---------------------------------------------------------------------------- INICIO EESTRUCTURA VISTA APLICACION ------------------------------------------------------------------------
 	public VistaAplicacion(Usuario user) throws Exception {
@@ -77,14 +85,17 @@ public class VistaAplicacion extends JPanel{
 		table = new JTable();
 		table.setModel(modeloTabla);
 		table.getTableHeader().setReorderingAllowed(false); // Daniel : No permite mover las columnas
+		
 		table.setFocusable(false); //Daniel: Quito el focus de las celdas, para que cuando seleccione una celda se vea toda la fila seleccionada y no el focus de la celda
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.setFillsViewportHeight(false); // No deja espacio abajo cuando se van eliminando filas.
 		table.getColumnModel().getColumn(0).setMaxWidth(40);//Daniel: configuro tamaño maximo de la columna ID
 		table.getColumnModel().getColumn(1).setMaxWidth(1000); //Daniel: configuro tamaño maximo de la columna Titulo
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setBounds(46, 213, 747, 194);
 		scrollPane_1.setViewportView(table);
+		
 		frmLibros.getContentPane().add(scrollPane_1);
 		
 		lTitulo = new JTextField();
@@ -99,17 +110,17 @@ public class VistaAplicacion extends JPanel{
 		lAutor.setBounds(151, 495, 642, 31);
 		frmLibros.getContentPane().add(lAutor);
 		
-		JButton btnNewButton = new JButton("INSERTAR");
-		btnNewButton.setBounds(151, 567, 104, 23);
-		frmLibros.getContentPane().add(btnNewButton);
+		bInsertar = new JButton("INSERTAR");
+		bInsertar.setBounds(151, 567, 104, 23);
+		frmLibros.getContentPane().add(bInsertar);
 		
 		bLimpiar = new JButton("LIMPIAR");
 		bLimpiar.setBounds(559, 567, 102, 23);
 		frmLibros.getContentPane().add(bLimpiar);
 		
-		JButton btnNewButton_2 = new JButton("ACTUALIZAR");
-		btnNewButton_2.setBounds(427, 567, 120, 23);// Daniel: (Posicion pixel Izquierda, posicion pixel Superior, anchura, altura)
-		frmLibros.getContentPane().add(btnNewButton_2);
+		bActualizar = new JButton("ACTUALIZAR");
+		bActualizar.setBounds(427, 567, 120, 23);// Daniel: (Posicion pixel Izquierda, posicion pixel Superior, anchura, altura)
+		frmLibros.getContentPane().add(bActualizar);
 		
 		bSalir = new JButton("SALIR");
 		bSalir.setBounds(689, 567, 104, 23);
@@ -129,7 +140,13 @@ public class VistaAplicacion extends JPanel{
 		bBorrar.setBounds(289, 567, 102, 23);
 		frmLibros.getContentPane().add(bBorrar);
 		
+		mensaje = new JLabel();
+		mensaje.setFont(new Font("Trebuchet MS", Font.BOLD, 14));
+		mensaje.setBounds(10, 616, 600, 14);
+		frmLibros.getContentPane().add(mensaje);
+		
 		generarContenidoTabla();
+		
 	}
 	//--------------------------------------------------------------------------FIN ESTRUCTURA VISTA APLICACION ------------------------------------------------------------------------------
 	
@@ -145,6 +162,12 @@ public class VistaAplicacion extends JPanel{
 		
 		bSalir.addActionListener(ctrl);
 		bSalir.setActionCommand("SALIR");
+		
+		bInsertar.addActionListener(ctrl);
+		bInsertar.setActionCommand("INSERTAR");
+		
+		bActualizar.addActionListener(ctrl);
+		bActualizar.setActionCommand("ACTUALIZAR");
 	}
 	
 	//Apartado 3. Daniel Cuevas : CONTROLADOR TABLA.
@@ -193,7 +216,7 @@ public class VistaAplicacion extends JPanel{
 	 public void limpiar(){
 		 lTitulo.setText("");;
 		 lAutor.setText("");
-		 table.clearSelection();
+		 table.clearSelection(); 
 	 }
 	 /*
 	  *  Daniel : Apartado 7. Método que utiliza el controlador cuando se pulsa el boton BORRAR
@@ -201,12 +224,53 @@ public class VistaAplicacion extends JPanel{
 	  *  Tambien limpio los campos textFiled del libro a borrar.
 	  */
 	 public void borrar() throws Exception{
-		 int id = (int) table.getModel().getValueAt(table.getSelectedRow(), 0); // obtengo valor ID de la fila seleccionada 
-		 tLibro libro = new tLibro(id);// Creo objeto libro con el id obtenido
-		 libro.BorrarLibro(); // metodo para borrar libro de la Base de datos
-		 modeloTabla.removeRow(table.getSelectedRow());// Elimina la fila que getSelectedRow() devuelve.
-		 limpiar();
+		 
+		int id = (int) table.getModel().getValueAt(table.getSelectedRow(), 0); // obtengo valor ID de la fila seleccionada
+		tLibro libro = new tLibro(id);// Creo objeto libro con el id obtenido
+		libro.BorrarLibro(); // metodo para borrar libro de la Base de datos
+		modeloTabla.removeRow(table.getSelectedRow());// Elimina la fila que getSelectedRow() devuelve.
+		limpiar();
 	 }
+	 
+	 public void insertar() throws SQLException {
+
+		String titulo = lTitulo.getText();
+		String autor = lAutor.getText();
+		String materia = listMateria.getSelectedValue();
+		String idMat = (String) tMateria.encontrarID(materia);	
+			
+		tLibro lib = new tLibro(titulo,autor,idMat); 
+			 
+		Object[] obj = new Object[2]; 
+		obj[0]= lib.getID();
+		obj[1] = lib.getTitulo();
+			
+		modeloTabla.addRow(obj);
+	 }
+	 
+	public void actualizar() throws SQLException {
+
+		int id = (int) table.getModel().getValueAt(table.getSelectedRow(), 0);
+		tLibro libro = new tLibro(id);
+
+		String titulo = lTitulo.getText();
+		String autor = lAutor.getText();
+		String materia = listMateria.getSelectedValue();
+		String idMatApp = tMateria.encontrarID(materia);
+
+		String idMatLib = libro.getID_Materia();
+
+		if (!titulo.equals(libro.getTitulo())) {
+			libro.setTitulo(titulo);
+			modeloTabla.setValueAt(titulo, table.getSelectedRow(), 1);
+		}
+		if (!autor.equals(libro.getAutor())) {
+			libro.setAutor(autor);
+		}
+		if (!idMatApp.equals(idMatLib)) {
+			libro.setID_Materia(idMatApp);
+		}
+	}
 	
 	 public JTable getTabla(){
 		 return table;
@@ -217,10 +281,19 @@ public class VistaAplicacion extends JPanel{
 	 public Usuario getUsuario(){
 		 return usuario;
 	 }
-	 
-	 public void mensaje(String mensaje){
-		 //Jairo create un JLabel en la base de la vista para escribir mensajes ahi
-		 //Para poner por ejemplo : Libro borrado con exito, Libro insertado con exito, Libro modificado con exito...
+	 public JTextField getTitulo(){
+		 return lTitulo;
+	 }
+	 public JLabel getMensaje(){
+		 return mensaje;
+	 }
+	 public void mensajeExitoso(){
+		 mensaje.setForeground(new Color(0, 204, 0));
+		 mensaje.setText("Operazión con exito");
+	 }
+	 public void mensajeNoPermiso(){
+		 mensaje.setForeground(Color.RED);
+		 mensaje.setText("Error: usuario sin permiso");
 	 }
 	 
 	 //Daniel: Apartado 4. Método auxiliar que utiliza el controlador de la vista para cerrar la ventana
